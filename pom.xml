@@ -11,6 +11,7 @@
     <modules>
         <module>zoo-origin</module>
         <module>zoo-zkclient</module>
+        <module>zoo-curator</module>
     </modules>
 
     <properties>
