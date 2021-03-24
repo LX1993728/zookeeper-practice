@@ -12,6 +12,7 @@
         <module>zoo-origin</module>
         <module>zoo-zkclient</module>
         <module>zoo-curator</module>
+        <module>zoo-commons</module>
     </modules>
 
     <properties>
@@ -19,19 +20,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.25</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
 

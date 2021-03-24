@@ -1,0 +1,7 @@
+/.idea/workspace.xml
+/.idea/**
+/**/*.iml
+/**/target
+/logs
+/**/*.log
+/**/*.db
