@@ -1,11 +1,11 @@
 package liuxun.zoo.curator.ninestars.tests;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class TestWatcher {
 
     @Test
@@ -22,10 +23,10 @@ public class TestWatcher {
         treeCache.getListenable().addListener(new TreeCacheListener() {
             @Override
             public void childEvent(CuratorFramework curatorFramework, TreeCacheEvent treeCacheEvent) throws Exception {
-                System.out.println(treeCacheEvent.getType());
-                
-                System.out.println(treeCacheEvent.getData().getPath());
-                System.out.println(new String(treeCacheEvent.getData().getData()));
+                log.info("{}", treeCacheEvent.getType());
+                final ChildData data = treeCacheEvent.getData();
+                log.info("{}", data != null ? data.getPath() : "null");
+                log.info("{}", data != null ? new String(data.getData()) : "null");
             }
         });
         treeCache.start();
@@ -38,9 +39,9 @@ public class TestWatcher {
         treeCache.getListenable().addListener(new TreeCacheListener() {
             @Override
             public void childEvent(CuratorFramework curatorFramework, TreeCacheEvent treeCacheEvent) throws Exception {
-                System.out.println(treeCacheEvent.getType());
-                System.out.println(treeCacheEvent.getData().getPath());
-                System.out.println(new String(treeCacheEvent.getData().getData()));
+                log.info("{}", treeCacheEvent.getType());
+                log.info(treeCacheEvent.getData().getPath());
+                log.info(new String(treeCacheEvent.getData().getData()));
             }
         });
         treeCache.start();
