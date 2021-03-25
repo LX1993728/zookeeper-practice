@@ -14,7 +14,6 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -40,7 +39,7 @@ public class DistributedDelayQueueExample {
             queue = builder.buildDelayQueue();
             queue.start();
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 10; i++) {
                 Thread.sleep(100);
                 queue.put("test-" + i, System.currentTimeMillis() + 10000);
             }
