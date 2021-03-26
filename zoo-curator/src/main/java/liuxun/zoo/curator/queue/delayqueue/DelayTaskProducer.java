@@ -17,7 +17,6 @@ public class DelayTaskProducer {
     private static final int SESSION_OUTTIME = 5000;
     private static final String QUEUE_PATH = "/queue";
     private static final String NAMESPACE = "delayTask";
-    private static final String LOCK_PATH = "/lock";
     RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 10);
     private CuratorFramework curatorFramework;
     private DistributedDelayQueue<String> delayQueue;
