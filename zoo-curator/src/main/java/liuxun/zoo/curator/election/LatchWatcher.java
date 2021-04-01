@@ -63,17 +63,18 @@ public class LatchWatcher {
             }
         });
         treeCache.start();
-        TimeUnit.HOURS.sleep(1);
     }
 
     @Test
     public void test1() throws Exception {
         test();
+        TimeUnit.HOURS.sleep(1);
     }
 
     @Test
     public void test2() throws Exception {
         test();
+        TimeUnit.HOURS.sleep(1);
     }
 }
 

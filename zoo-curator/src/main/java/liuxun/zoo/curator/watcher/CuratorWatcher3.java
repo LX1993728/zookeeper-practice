@@ -3,10 +3,13 @@ package liuxun.zoo.curator.watcher;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkImpl;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+
+import java.util.concurrent.TimeUnit;
 
 public class CuratorWatcher3 {
 
@@ -46,6 +49,9 @@ public class CuratorWatcher3 {
         });
         treeCache.start();
         ;
+        TimeUnit.SECONDS.sleep(30);
+        CuratorFrameworkImpl cfImpl = (CuratorFrameworkImpl) curatorFramework;
+
         Thread.sleep(Integer.MAX_VALUE);
     }
 
