@@ -1,6 +1,6 @@
 package com.zoo.ninestar.controllers;
 
-import com.zoo.ninestar.config.ZooPkPathConfig;
+import com.zoo.ninestar.config.zoo.ZooPkPathConfig;
 import com.zoo.ninestar.domains.NSPathInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

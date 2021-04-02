@@ -1,4 +1,4 @@
-package com.zoo.ninestar.config;
+package com.zoo.ninestar.config.zoo;
 
 import com.zoo.ninestar.domains.NSPathInfo;
 import com.zoo.ninestar.enums.NSHurtType;
