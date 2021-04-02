@@ -1,5 +1,8 @@
 package com.zoo.ninestar.enums;
 
+/**
+ * nine star master type
+ */
 public enum NSMasterType {
     INITIATOR("initiator", 1), ACCEPTOR("acceptor", 2);
 
@@ -12,9 +15,18 @@ public enum NSMasterType {
     }
 
     public static String getName(int index){
-        for (NSMasterType nmStar : NSMasterType.values()){
-            if (nmStar.getIndex() == index){
-                return nmStar.getName();
+        for (NSMasterType masterType : NSMasterType.values()){
+            if (masterType.getIndex() == index){
+                return masterType.getName();
+            }
+        }
+        return null;
+    }
+
+    public static NSMasterType getType(String name){
+        for (NSMasterType masterType : NSMasterType.values()){
+            if (masterType.getName().equals(name)){
+                return masterType;
             }
         }
         return null;

@@ -1,7 +1,10 @@
 package com.zoo.ninestar.enums;
 
+/**
+ * nine start hurt type
+ */
 public enum NSHurtType {
-    A("hurt_a", 1), B("/hurt_b", 2);
+    A("hurt_a", 1), B("hurt_b", 2);
 
     private String name;
     private int index;
@@ -12,9 +15,18 @@ public enum NSHurtType {
     }
 
     public static String getName(int index){
-        for (NSHurtType nmStar : NSHurtType.values()){
-            if (nmStar.getIndex() == index){
-                return nmStar.getName();
+        for (NSHurtType hurtType : NSHurtType.values()){
+            if (hurtType.getIndex() == index){
+                return hurtType.getName();
+            }
+        }
+        return null;
+    }
+
+    public static NSHurtType getType(String name){
+        for (NSHurtType hurtType : NSHurtType.values()){
+            if (hurtType.getName().equals(name)){
+                return hurtType;
             }
         }
         return null;
