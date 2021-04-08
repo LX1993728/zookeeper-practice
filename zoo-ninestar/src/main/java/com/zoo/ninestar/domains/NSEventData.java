@@ -14,4 +14,14 @@ public class NSEventData {
     private String data;
     private String address;
     private NSEventType type;
+
+    @Override
+    public String toString() {
+        return "NSEventData{" +
+                "path='" + path + '\'' +
+                ", data='" + data + '\'' +
+                ", address='" + address + '\'' +
+                ", type=" + type +
+                '}';
+    }
 }

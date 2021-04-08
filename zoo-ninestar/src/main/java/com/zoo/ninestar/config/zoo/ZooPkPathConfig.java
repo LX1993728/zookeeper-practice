@@ -37,7 +37,12 @@ public class ZooPkPathConfig {
     }
     // get the prefix of all pk
     public static String getPksPrefix(){
-        return "/" + PREFIX + "/" + PKS + "/";
+        return getPksPrefix(true);
+    }
+
+    public static String getPksPrefix(boolean includeSuffix){
+        String p =  "/" + PREFIX + "/" + PKS;
+        return includeSuffix ? p + "/" : p;
     }
 
     // get the prefix of one pk

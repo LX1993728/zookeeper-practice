@@ -18,11 +18,11 @@ public class NSBusinessTask extends SpringBootBeanAutowiringSupport implements R
     @Autowired
     private NSService nsService;
 
-    private static final AtomicInteger businessTaskCount = new AtomicInteger(0);
+    public static final AtomicInteger businessTaskCount = new AtomicInteger(0);
 
     public NSBusinessTask(NSEventData eventData) throws InterruptedException {
         ZooClientConfig.BUSINESS_QUEUE.put(eventData);
-        businessTaskCount.addAndGet(1);
+        businessTaskCount.incrementAndGet();
     }
 
     @Override
@@ -37,10 +37,11 @@ public class NSBusinessTask extends SpringBootBeanAutowiringSupport implements R
                 // TODO: 根据队列中取出eventdata内容 调用nsService 处理与业务相关的逻辑
                 // ...
             }
-            businessTaskCount.decrementAndGet();
             log.info("Business Task\t{} is completed", Thread.currentThread().getId());
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }finally {
+            businessTaskCount.decrementAndGet();
         }
     }
 }

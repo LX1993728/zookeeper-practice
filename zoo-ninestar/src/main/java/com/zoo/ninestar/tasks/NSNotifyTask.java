@@ -6,9 +6,9 @@ import com.zoo.ninestar.domains.NSEventData;
 import com.zoo.ninestar.services.NSService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 处理通知任务派发的逻辑
@@ -18,8 +18,11 @@ public class NSNotifyTask extends SpringBootBeanAutowiringSupport implements Run
     @Autowired
     private NSService nsService;
 
+    public static final AtomicInteger notifyTaskCount = new AtomicInteger(0);
+
     public NSNotifyTask(NSEventData eventData) throws InterruptedException {
         ZooClientConfig.NOTIFY_QUEUE.put(eventData);
+        notifyTaskCount.incrementAndGet();
     }
 
     private String getUrl(NSEventData data){
@@ -30,17 +33,21 @@ public class NSNotifyTask extends SpringBootBeanAutowiringSupport implements Run
     public void run() {
         try {
             while (!ZooClientConfig.NOTIFY_QUEUE.isEmpty()){
-                final NSEventData eventData = ZooClientConfig.BUSINESS_QUEUE.poll(10, TimeUnit.SECONDS);
+                final NSEventData eventData = ZooClientConfig.NOTIFY_QUEUE.poll(10, TimeUnit.SECONDS);
                 if (eventData == null){
                     return;
                 }
                 String url = getUrl(eventData);
-                // TODO:调用Http--post方法 分配任务到指定进程
-                // ...
+                eventData.setAddress(url);
+                log.info("notify task data= {}, url={}", eventData.toString(), url);
+                // 调用Http--post方法 分配任务到指定进程
+                nsService.postNotifyTaskEventDataToSlave(eventData);
             }
             log.info("Notify Task\t{} is completed", Thread.currentThread().getId());
         }catch (InterruptedException e){
             e.printStackTrace();
+        }finally {
+            notifyTaskCount.decrementAndGet();
         }
     }
 

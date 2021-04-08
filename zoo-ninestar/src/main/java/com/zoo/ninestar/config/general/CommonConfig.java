@@ -2,13 +2,16 @@ package com.zoo.ninestar.config.general;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
-public class ThreadPoolConfig {
+public class CommonConfig {
     @Bean("taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
@@ -26,4 +29,19 @@ public class ThreadPoolConfig {
         taskExecutor.initialize();
         return taskExecutor;
     }
+
+
+    @Bean
+    public ClientHttpRequestFactory simpleClientHttpRequestFactory(){
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(30000);  // 单位为ms
+        factory.setConnectTimeout(30000);  // 单位为ms
+        return factory;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(ClientHttpRequestFactory factory){
+        return new RestTemplate(factory);
+    }
+
 }
