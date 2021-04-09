@@ -114,10 +114,16 @@ public class ZooPkPathConfig {
         if (!matcher.matchStart(getPksPrefix() + "/**", path)){
             return false;
         }
-        if (matcher.match(getOnePkPrefix("{pkId}", true) + "/**", path)){
-            return true;
+        if (!matcher.match(getOnePkPrefix("{pkId}", true) + "/**", path)){
+            return false;
         }
-        return false;
+
+        if (matcher.match( "**/buffs/**", path)){
+            return false;
+        }
+
+
+        return true;
     }
 
     /**

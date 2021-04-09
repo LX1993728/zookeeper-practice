@@ -4,7 +4,8 @@ import com.zoo.ninestar.domains.NSEventData;
 
 /**
  * the operations for nine star
+ * common business
  */
-public interface NSService {
+public interface NSCommonService {
     void postNotifyTaskEventDataToSlave(NSEventData eventData);
 }

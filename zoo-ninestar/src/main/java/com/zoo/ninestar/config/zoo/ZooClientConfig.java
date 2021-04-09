@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.queue.QueueSerializer;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -37,6 +39,9 @@ public class ZooClientConfig {
     // 任务执行队列 (存放数据)
     public static final BlockingQueue<NSEventData> BUSINESS_QUEUE = new ArrayBlockingQueue<>(BUSINESS_QUEUE_MAX_SIZE);
 
+    // 延时队列结束的标识
+    public static final String DELAY_END_FLAG = "E";
+
     // ------------------------------  the follows config is used for zk curator  client ---------------------------------
     private static final String CONNECT_ADDR = "localhost:2181";
     private static final int SESSION_OUTTIME = 500000000;//ms
@@ -52,4 +57,17 @@ public class ZooClientConfig {
                 .build();
     }
 
+    @Bean
+    public QueueSerializer<String> queueSerializer() {
+        return new QueueSerializer<String>() {
+            @Override
+            public byte[] serialize(String item) {
+                return item.getBytes(StandardCharsets.UTF_8);
+            }
+            @Override
+            public String deserialize(byte[] bytes) {
+                return new String(bytes, StandardCharsets.UTF_8);
+            }
+        };
+    }
 }

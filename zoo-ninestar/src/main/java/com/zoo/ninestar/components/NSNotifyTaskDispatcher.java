@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -111,7 +112,7 @@ public class NSNotifyTaskDispatcher {
         }
 
         if (event.getData().getData() != null){
-            eventData.setData(new String(event.getData().getData()));
+            eventData.setData(new String(event.getData().getData(), StandardCharsets.UTF_8));
         }
         String address = getRandomID();
         Assert.isTrue(StringUtils.isNotBlank(address), "random address cannot be null!!!");

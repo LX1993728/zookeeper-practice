@@ -3,7 +3,7 @@ package com.zoo.ninestar.tasks;
 import com.zoo.ninestar.config.beanAutowire.SpringBootBeanAutowiringSupport;
 import com.zoo.ninestar.config.zoo.ZooClientConfig;
 import com.zoo.ninestar.domains.NSEventData;
-import com.zoo.ninestar.services.NSService;
+import com.zoo.ninestar.services.NSCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class NSBusinessTask extends SpringBootBeanAutowiringSupport implements Runnable {
     @Autowired
-    private NSService nsService;
+    private NSCommonService nsCommonService;
 
     public static final AtomicInteger businessTaskCount = new AtomicInteger(0);
 

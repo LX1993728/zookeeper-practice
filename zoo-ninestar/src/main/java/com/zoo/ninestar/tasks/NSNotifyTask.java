@@ -3,7 +3,7 @@ package com.zoo.ninestar.tasks;
 import com.zoo.ninestar.config.beanAutowire.SpringBootBeanAutowiringSupport;
 import com.zoo.ninestar.config.zoo.ZooClientConfig;
 import com.zoo.ninestar.domains.NSEventData;
-import com.zoo.ninestar.services.NSService;
+import com.zoo.ninestar.services.NSCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class NSNotifyTask extends SpringBootBeanAutowiringSupport implements Runnable {
     @Autowired
-    private NSService nsService;
+    private NSCommonService nsCommonService;
 
     public static final AtomicInteger notifyTaskCount = new AtomicInteger(0);
 
@@ -39,9 +39,8 @@ public class NSNotifyTask extends SpringBootBeanAutowiringSupport implements Run
                 }
                 String url = getUrl(eventData);
                 eventData.setAddress(url);
-                log.info("notify task data= {}, url={}", eventData.toString(), url);
                 // 调用Http--post方法 分配任务到指定进程
-                nsService.postNotifyTaskEventDataToSlave(eventData);
+                nsCommonService.postNotifyTaskEventDataToSlave(eventData);
             }
             log.info("Notify Task\t{} is completed", Thread.currentThread().getId());
         }catch (InterruptedException e){
