@@ -2,6 +2,7 @@ package com.zoo.ninestar.components;
 
 import com.zoo.ninestar.config.beanAutowire.SpringBootBeanAutowiringSupport;
 import com.zoo.ninestar.config.zoo.ZooClientConfig;
+import com.zoo.ninestar.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.queue.DistributedDelayQueue;
@@ -10,6 +11,8 @@ import org.apache.curator.framework.recipes.queue.QueueSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,6 +20,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class NSDelayProducer extends SpringBootBeanAutowiringSupport {
+    // 队列容器
+    private static final ConcurrentMap<String, DistributedDelayQueue<String>> QUEUE_MAP = new ConcurrentHashMap<>();
+
     @Autowired
     private CuratorFramework curatorFramework;
 
@@ -46,6 +52,8 @@ public class NSDelayProducer extends SpringBootBeanAutowiringSupport {
             delayQueue.start();
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            QUEUE_MAP.put(path.trim(), delayQueue);
         }
     }
     public void produce(String content,long timeMilis) throws Exception {
@@ -54,6 +62,25 @@ public class NSDelayProducer extends SpringBootBeanAutowiringSupport {
 
     public void produce(String content,long keepalive, TimeUnit timeUnit) throws Exception {
         this.produce(content, timeUnit.toMillis(keepalive));
+    }
+
+    /**
+     * this static method is used for auto close queue  when consume empty or  force close
+     * @param path
+     * @throws Exception
+     */
+    public static void closeDelayQueue(String path) throws Exception {
+        final CuratorFramework curatorFramework = SpringContextUtil.getBean(CuratorFramework.class);
+        curatorFramework.delete().guaranteed().deletingChildrenIfNeeded().forPath(path);
+        DistributedDelayQueue<String> queue = QUEUE_MAP.get(path.trim());
+        if (queue == null){
+            log.warn("the delay queue for path {} cannot be found", path);
+            return;
+        }
+        queue.close();
+        QUEUE_MAP.remove(path.trim());
+
+        log.info("------ queue for path {} destroy queue={} ----", path, queue);
     }
 
     public void close() throws IOException {

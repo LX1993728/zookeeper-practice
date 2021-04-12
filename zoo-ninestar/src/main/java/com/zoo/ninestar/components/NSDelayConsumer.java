@@ -2,15 +2,18 @@ package com.zoo.ninestar.components;
 
 import com.zoo.ninestar.config.beanAutowire.SpringBootBeanAutowiringSupport;
 import com.zoo.ninestar.services.NSCommonService;
+import com.zoo.ninestar.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.queue.DistributedDelayQueue;
 import org.apache.curator.framework.recipes.queue.QueueConsumer;
 import org.apache.curator.framework.state.ConnectionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 /**
- * 血条消费者
+ * buff consumer
  */
 @Slf4j
 public class NSDelayConsumer extends SpringBootBeanAutowiringSupport implements QueueConsumer<String> {
@@ -34,16 +37,13 @@ public class NSDelayConsumer extends SpringBootBeanAutowiringSupport implements 
         this.endFlag = endFlag;
         this.path = path;
         this.type = type;
+        Assert.isTrue(StringUtils.isNotBlank(path), "path cannot be black !!!");
     }
 
     @Override
     public void consumeMessage(String message) throws Exception {
         if (message.equals(endFlag)){
-            if (delayQueue != null){
-                delayQueue.close();
-            }
-            curatorFramework.delete().guaranteed().deletingChildrenIfNeeded().forPath(path);
-            log.info("------ queue for path {} destroy queue={} ----", path, delayQueue);
+            NSDelayProducer.closeDelayQueue(path);
         }else {
             resovleMessage(message);
         }
