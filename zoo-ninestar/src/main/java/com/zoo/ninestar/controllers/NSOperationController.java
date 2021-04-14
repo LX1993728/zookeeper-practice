@@ -12,4 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/ns")
 public class NSOperationController {
 
+    /**
+     * 主播侧技能:
+     */
 }
