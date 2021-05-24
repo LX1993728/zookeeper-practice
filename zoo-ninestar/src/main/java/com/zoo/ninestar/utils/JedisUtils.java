@@ -1,10 +1,15 @@
 package com.zoo.ninestar.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -207,6 +212,128 @@ public class JedisUtils {
     public interface RedisAction<T> {
         T action(Jedis jedis);
     }
+
+    //-----------------  Map <--> bean <--> Hash 之间的转换 --------------------------
+
+    /**
+     * 对象转Map
+     * @param obj
+     * @return
+     */
+    public static Map<String, Object> obj2OBJMap(Object obj) {
+        JSON.DEFFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+        return JSON.parseObject(JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat));
+    }
+
+    public static Map<String, String> obj2STRMap(Object obj) {
+        assert obj != null;
+        Map<String, Object> soMap = obj2OBJMap(obj);
+        Map<String, String> resultMap = new HashMap<>();
+        for (Map.Entry<String, Object> entry : soMap.entrySet()){
+            String fieldName = entry.getKey();
+            Object fieldValue = entry.getValue();
+            if ((fieldValue instanceof String ||
+                    fieldValue instanceof Number ||
+                    fieldValue instanceof Boolean)){
+                resultMap.put(fieldName, fieldValue.toString());
+            }
+        }
+        return resultMap;
+    }
+
+    /**
+     * 将对象转为Hash 存储到redis中
+     * @param obj
+     * @param key
+     * @return
+     */
+    public static Map<String, String> hmsetResetObj(Object obj, String key){
+        assert StringUtils.isNotBlank(key);
+        final Map<String, String> strMap = obj2STRMap(obj);
+        if (!strMap.isEmpty()){
+            new JedisUtils().action(jedis -> jedis.hmset(key, strMap));
+        }
+        return strMap;
+    }
+
+    /**
+     * 更新redis 中hash的字段值
+     * @param obj
+     * @param key
+     * @return
+     */
+    public static Map<String, String> hmsetUpdateObj(Object obj, String key){
+        assert StringUtils.isNotBlank(key);
+        final Map<String, String> strMap = obj2STRMap(obj);
+        if (!strMap.isEmpty()){
+            for (Map.Entry<String, String> entry : strMap.entrySet()){
+                String fieldName = entry.getKey();
+                String fieldValue = entry.getValue();
+                if (fieldValue != null){
+                    new JedisUtils().action(jedis -> jedis.hset(key, fieldName, fieldValue));
+                }
+            }
+        }
+        return strMap;
+    }
+
+    /**
+     * 并发操作Long类型的数据 递增
+     * @param clazz
+     * @param key
+     * @param fieldName
+     * @param incrValue
+     * @param maxValue
+     * @return
+     */
+    public static Long hincrByObjField(Class clazz, String key, String fieldName, long incrValue, long maxValue ){
+        assert clazz != null;
+        assert  StringUtils.isNotBlank(key) && StringUtils.isNotBlank(fieldName);
+        boolean  isFieldNameValied = false;
+        try {
+            final Field field = clazz.getDeclaredField(fieldName);
+            isFieldNameValied = true;
+        } catch (NoSuchFieldException ignored) {
+        }
+        assert isFieldNameValied;
+
+        Long operateValue = new JedisUtils().action(jedis -> jedis.hincrBy(key, fieldName, incrValue));
+        if (operateValue > maxValue){
+            operateValue = new JedisUtils().action(jedis -> jedis.hset(key, fieldName, String.valueOf(maxValue)));
+        }
+
+        return operateValue;
+    }
+
+    /**
+     * 并发操作Long类型的数据 递减
+     * @param clazz
+     * @param key
+     * @param fieldName
+     * @param decrValue
+     * @param minValue
+     * @return
+     */
+    public static Long hdecrByObjField(Class clazz, String key, String fieldName, long decrValue, long minValue ){
+        assert clazz != null;
+        assert  StringUtils.isNotBlank(key) && StringUtils.isNotBlank(fieldName);
+        boolean  isFieldNameValied = false;
+        try {
+            final Field field = clazz.getDeclaredField(fieldName);
+            isFieldNameValied = true;
+        } catch (NoSuchFieldException ignored) {
+        }
+        assert isFieldNameValied;
+
+        decrValue = -Math.abs(decrValue);
+        long finalDecrValue = decrValue;
+        Long operateValue = new JedisUtils().action(jedis -> jedis.hincrBy(key, fieldName, finalDecrValue));
+        if (operateValue < minValue){
+            operateValue = new JedisUtils().action(jedis -> jedis.hset(key, fieldName, String.valueOf(minValue)));
+        }
+        return operateValue;
+    }
+
 
 }
 

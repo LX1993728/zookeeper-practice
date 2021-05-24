@@ -2,7 +2,6 @@ package com.zoo.ninestar.components;
 
 import com.zoo.ninestar.config.beanAutowire.SpringBootBeanAutowiringSupport;
 import com.zoo.ninestar.services.NSCommonService;
-import com.zoo.ninestar.utils.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
